@@ -1,83 +1,54 @@
 package backtracking;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NQueens {
     public static void main(String[] args) {
         int n=4 ;
-        char board[][]=new char[n][n];
-        for(int i=0;i<n;i++){
-            for(int j=0;j<n;j++){
-                board[i][j]='.';
+        int board[][]=new int[n][n];
+        List<List<String>> result=new ArrayList<>();
+        nqueen(board,"",0,result);
+        System.out.println(result);
+    }
+    public static List<String> constructBoard(int chess[][]){
+        List<String> ans=new ArrayList<>();
+        for(int i=0;i<chess.length;i++){
+            String str="";
+            for(int j=0;j<chess.length;j++){
+                if(chess[i][j]==1){
+                    str+="Q";
+                }else str+='.';
             }
+            ans.add(str);
         }
-        nqueen(board,0);
+        return ans;
     }
 
-    public static void nqueen(char board[][],int row) {
-        int n=board.length;
-        if(row==n){
-            for(int i=0;i<n;i++){
-                for(int j=0;j<n;j++){
-                    System.out.print(board[i][j]);
-                }
-                System.out.println();
-            }
-            System.out.println();
+    public static void nqueen(int chess[][], String qsf, int row, List<List<String>> result) {
+
+        if(chess.length==row){
+//            System.out.println(qsf);
+            result.add(constructBoard(chess));
             return;
         }
-        for(int j=0;j<n;j++) {
-            if (isSafe(board, row, j)) {
-                board[row][j] = 'Q';
-                nqueen(board, row + 1);
-                board[row][j] = '.'; // backtracking
+        for(int col=0;col<chess.length;col++){
+            if(safePlace(chess,row,col)){
+                chess[row][col]=1;
+                nqueen(chess,qsf+row+"-"+col+",",row+1,result);
+                chess[row][col]=0;
             }
         }
     }
-
-    public static boolean isSafe(char board[][], int row,int col) {
-        int n=board.length;
-//        check row
-        for(int j=0;j<n;j++){
-            if(board[row][j]=='Q') return false;
+    public static boolean safePlace(int chess[][],int row,int col){
+        for(int i=row-1,j=col;i>=0;i--){
+            if(chess[i][j]==1) return false;
         }
-//        check column
-        for(int i=0;i<n;i++){
-            if(board[i][col]=='Q') return false;
+        for(int i=row-1,j=col-1;i>=0 && j>=0; i--,j--){
+            if(chess[i][j]==1) return false;
         }
-//        check north-east
-        int i=row;
-        int j=col;
-
-        while(i>=0 && j<n){
-            if(board[i][j]=='Q')return false;
-            i--;
-            j++;
-        }
-        //        check south-east
-        i=row;
-        j=col;
-
-        while(i<n && j<n){
-            if(board[i][j]=='Q')return false;
-            i++;
-            j++;
-        }
-        //        check south-west
-        i=row;
-        j=col;
-
-        while(i<n && j>=0){
-            if(board[i][j]=='Q')return false;
-            i++;
-            j--;
-        }
-        //        check north-west
-        i=row;
-        j=col;
-
-        while(i>=0 && j>=0){
-            if(board[i][j]=='Q')return false;
-            i--;
-            j--;
+        for(int i=row-1,j=col+1;i>=0 && j<chess.length;i--,j++){
+            if(chess[i][j]==1) return false;
         }
         return true;
     }
